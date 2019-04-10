@@ -13,7 +13,9 @@
   "devDependencies": {
     "@babel/core": "7.4.3",
     "@babel/runtime": "7.4.3",
+    "babel-eslint": "^10.0.1",
     "babel-jest": "24.7.0",
+    "eslint-plugin-react": "^7.12.4",
     "jest": "24.7.0",
     "metro-react-native-babel-preset": "0.53.1",
     "react-test-renderer": "16.8.3"
