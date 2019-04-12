@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import shuffle from 'lodash.shuffle';
 
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -20,24 +21,40 @@ class Game extends React.Component {
   target = this.randomNumbers.slice(0, this.props.randomNumberCount - 2)
     .reduce((acc, curr) => acc + curr, 0);
 
+  shuffledRandomNumbers = shuffle(this.randomNumbers);
+
+  gameStatus = 'PLAYING';
+
   componentDidMount() {
-    this.intervalId = setInterval(()=> {
-      this.setState((prevState)=> ({
-        remainingSeconds: prevState.remainingSeconds-1
-      }), ()=> {
-        if(this.state.remainingSeconds === 0) {clearInterval(this.intervalId);}
+    this.intervalId = setInterval(() => {
+      this.setState((prevState) => ({
+        remainingSeconds: prevState.remainingSeconds - 1
+      }), () => {
+        if (this.state.remainingSeconds === 0) { clearInterval(this.intervalId); }
       });
     }, 1000);
   }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (this.state.selectedIds !== nextState.selectedIds || this.state.remainingSeconds === 0) {
+      this.calcGameStatus(nextState);
+    }
+
+    if (this.gameStatus != 'PLAYING') {
+      clearInterval(this.intervalId);
+    }
+  }
+
   componentWillUnmount() {
     clearInterval(this.intervalId);
   }
-  gameStatus = () => {
-    const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
-      return acc + this.randomNumbers[curr];
+  
+  calcGameStatus = (nextState) => {
+    const sumSelected = nextState.selectedIds.reduce((acc, curr) => {
+      return acc + this.shuffledRandomNumbers[curr];
     }, 0);
 
-    if (this.state.remainingSeconds === 0) { return 'LOST'; }
+    if (nextState.remainingSeconds === 0) { return 'LOST'; }
     if (sumSelected === this.target) { return 'WON'; }
     if (sumSelected > this.target) { return 'LOST'; }
     if (sumSelected < this.target) { return 'PLAYING'; }
@@ -55,13 +72,13 @@ class Game extends React.Component {
   };
 
   render() {
-    const gameStatus = this.gameStatus();
+    const gameStatus = this.gameStatus;
     return (
       <View style={styles.container}>
         <Text style={[styles.target, styles[`STATUS_${gameStatus}`]]}>{this.target}</Text>
         <Text>{this.state.remainingSeconds}</Text>
         <View style={[styles.randomContainer,]}>
-          {this.randomNumbers.map((randomNumber, index) =>
+          {this.shuffledRandomNumbers.map((randomNumber, index) =>
             <RandomNumber
               key={index}
               id={index}
