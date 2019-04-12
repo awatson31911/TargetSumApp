@@ -17,7 +17,7 @@
     },
     "plugins": ["react"],
     "rules": {
-      "react/prp-types": ["off"],
+      "react/prp-types": ["on"],
       "react/display-name": ["off"],
       "react/no-unescaped-entities": ["off"],
       "indent": ["error", 2, {"SwitchCase": 1}],
